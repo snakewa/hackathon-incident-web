@@ -4,7 +4,7 @@ import React from 'react';
 import {
     Link
 } from 'react-router';
-import Elemental from 'elemental';
+import { Container, Row, Col, Card, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'elemental';
 import { GoogleMap, Marker, SearchBox } from "react-google-maps";
 
 require('elemental/less/elemental.less');
@@ -15,10 +15,19 @@ const GET_URL = 'http://192.168.10.241/get/event'
 
 let Welcome = React.createClass({
 
-    getInitialState: function() {
+	getInitialState: function() {
         return {
-            incidents: []
+            incidents: [],
+            modalIsOpen: false,
         };
+    },
+
+    toggleModal: function() {
+
+    	this.setState({
+    		modalIsOpen: !this.state.modalIsOpen
+    	});
+
     },
 
     componentDidMount: function() {
@@ -47,38 +56,61 @@ let Welcome = React.createClass({
 
     	for( var i = 0; i < 20; i++ ) {
 			cards.push(
-				<Elemental.Card key={'l'+i}>
+
+				<Card>
 					<a href="#">
 						Hello
 					</a>
-				</Elemental.Card>
+				</Card>
 			);
 		}
 
         return (
             <div className="welcome">
-            	<h1 className="u-text-center">Macau Incident Report</h1>
-              
-            	<Elemental.Container>
-	            	<Elemental.Row>
-	            		<Elemental.Col lg="1/4">
-	            			{cards}
-	            		</Elemental.Col>
 
-	            		<Elemental.Col lg="3/4">
-	            			<section style={{height: "100%"}}>
+
+            	<Container>
+            		<Row>
+            			<Col lg="1/6"></Col>
+            			<Col lg="4/6">
+            				<h1 className="u-text-center">Macau Incident Report</h1>
+            			</Col>
+            			<Col lg="1/6" style={{ marginTop: "12px" }}>
+            				<Button size="sm" className="u-float-right" onClick={this.toggleModal}>Submit Incident</Button>
+            			</Col>
+            		</Row>
+            	</Container>
+
+            	<Modal isOpen={this.state.modalIsOpen} onCancel={this.toggleModal} backdropClosesModal>
+					<ModalHeader text="Lots of text to show scroll behavior" showCloseButton onClose={this.toggleModal} />
+					<ModalBody>[...]</ModalBody>
+					<ModalFooter>
+						<Button type="primary" onClick={this.toggleModal}>Close modal</Button>
+						<Button type="link-cancel" onClick={this.toggleModal}>Also closes modal</Button>
+					</ModalFooter>
+				</Modal>
+
+            	<Container>
+	            	<Row>
+	            		<Col lg="1/4">
+
+	            			{cards}
+	            		</Col>
+
+	            		<Col lg="3/4">
+	            			<section style={{height: "800px"}}>
 						      <GoogleMap containerProps={{
 						          style: {
-						            height: "100%",
+						            height: "800px",
 						          },
 						        }}
-						        defaultZoom={3}
-						        defaultCenter={{lat: -25.363882, lng: 131.044922}}>
+						        defaultZoom={14}
+						        defaultCenter={{lat: 22.1667, lng: 113.5500}}>
 						      </GoogleMap>
 						    </section>
-	            		</Elemental.Col>
-	            	</Elemental.Row>
-            	</Elemental.Container>
+	            		</Col>
+	            	</Row>
+            	</Container>
 
             </div>
         )
