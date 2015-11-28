@@ -10,12 +10,16 @@ import { GoogleMap, Marker, SearchBox } from "react-google-maps";
 require('elemental/less/elemental.less');
 
 import jquery from 'jquery'
+import lodash from 'lodash'
+
+let $ = jquery
+let _ = lodash
 
 const GET_URL = 'http://192.168.10.241/get/event'
 
 let Welcome = React.createClass({
 
-	getInitialState: function() {
+	   getInitialState: function() {
         return {
             incidents: [],
             modalIsOpen: false,
@@ -23,52 +27,53 @@ let Welcome = React.createClass({
     },
 
     toggleModal: function() {
-
     	this.setState({
     		modalIsOpen: !this.state.modalIsOpen
     	});
-
     },
 
+    pullIncidents: function(){
+      var that = this;
+			$.ajax({
+				url: GET_URL,
+				dataType: 'json',
+				cache: false,
+				success: function(data) {
+					console.log(data);
+					if(data.status){
+						that.setState({incidents: data.data.events});
+					}else{
+						console.error('error from pull api1', data );
+					}
+				},
+				error: function(xhr, status, err) {
+					console.error('error from pull api2', status, err.toString());
+				}.bind(that)
+			});
+		},
+
     componentDidMount: function() {
-
-      jquery.ajax({
-        url: GET_URL,
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-          console.log(data);
-          if(data.status){
-              this.setState({incidents: data.events});  
-          }
-          
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(this.props.url, status, err.toString());
-        }.bind(this)
-      });
-
+      this.pullIncidents();
     },
 
     render: function () {
     	var cards = [];
       
+      console.log(['state', this.state]);
 
-    	for( var i = 0; i < 20; i++ ) {
-			cards.push(
+      _.mapKeys(this.state.incidents, function(value, key) {
+          cards.push(
+            <Card>
+              <a href="#">
+                {key}
+              </a>
+            </Card>
+          );  
 
-				<Card>
-					<a href="#">
-						Hello
-					</a>
-				</Card>
-			);
-		}
+      });
 
         return (
             <div className="welcome">
-
-
             	<Container>
             		<Row>
             			<Col lg="1/6"></Col>

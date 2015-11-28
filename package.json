@@ -47,6 +47,7 @@
     "json5-loader": "^0.6.0",
     "less": "^2.5.3",
     "less-loader": "^2.2.2",
+    "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "node-sass": "^3.3.3",
     "postcss-loader": "^0.6.0",
