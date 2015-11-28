@@ -22,7 +22,8 @@ let Welcome = React.createClass({
 
 	getInitialState: function() {
         return {
-            incidents: [],
+            incidents: {},
+            markers: [],
             modalIsOpen: false,
             latitude: null,
             longitude: null
@@ -70,7 +71,22 @@ let Welcome = React.createClass({
 				success: function(data) {
 					console.log(data);
 					if(data.status){
-						that.setState({incidents: data.data.events});
+             var incidents = data.data.events;
+             var  markers = [];
+             _.mapKeys(incidents, function(value, key) {
+                markers.push(
+                  {
+                    position: {
+                      lat: 1*value.lat,
+                      lng: 1*value.long,
+                    },
+                    key: key,
+                    defaultAnimation: 2,
+                  }
+                );
+            });
+             console.log('update',{incidents: data.data.events, markers:markers})
+						that.setState({incidents: data.data.events, markers:markers});
 					}else{
 						console.error('error from pull api1', data );
 					}
@@ -155,23 +171,29 @@ let Welcome = React.createClass({
 		        
 		    }
 		});
+	},
 
+    onMarkerRightclick: function(index){
+        console.log(index);
     },
 
     render: function () {
     	var cards = [];
       
+
        //console.log(['state', this.state]);
 
+      var ii = 0;
+
       _.mapKeys(this.state.incidents, function(value, key) {
+          ii++
           cards.push(
-            <Card>
+            <Card key={'c'+ii}>
               <a href="#">
-                {key}
+                {value.message} by {value.createBy} ({value.createdAt})
               </a>
             </Card>
           );  
-
       });
 
         return (
@@ -228,8 +250,15 @@ let Welcome = React.createClass({
 						            height: "800px",
 						          },
 						        }}
-						        defaultZoom={14}
+						        defaultZoom={13}
 						        defaultCenter={{lat: 22.1667, lng: 113.5500}}>
+                     {this.state.markers.map((marker, index) => {
+                      return (
+                        <Marker
+                          {...marker}
+                          onRightclick={() => this.onMarkerRightclick(index)} />
+                      );
+                    })}
 						      </GoogleMap>
 						    </section>
 	            		</Col>
