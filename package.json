@@ -1,0 +1,71 @@
+{
+    "name": "hack-incident",
+    "version": "0.1.0",
+    "description": "Project template that sets up a fully functioning react.js application with webpack.",
+    "main": "assets/js/bundle.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mvilrokx/react-starter-template.git"
+    },
+    "keywords": [
+        "template",
+        "react",
+        "webpack",
+        "hot module replacement",
+        "ES6",
+        "quickstart"
+    ],
+    "dependencies": {
+        "history": "^1.12.6",
+        "json-loader": "^0.5.3",
+        "randomcolor": "^0.4.0",
+        "react-intl": "^2.0.0-pr-3",
+        "react-router": "^1.0.0-rc3",
+        "react-tagsinput": "^2.0.1",
+        "redux": "^3.0.4"
+    },
+    "devDependencies": {
+        "amazeui-react": "^1.0.0-beta2",
+        "autoprefixer-core": "^6.0.1",
+        "babel-core": "^5.8.25",
+        "babel-loader": "^5.3.2",
+        "commander": "^2.9.0",
+        "css-loader": "^0.19.0",
+        "csswring": "^4.0.0",
+        "csvtojson": "^0.4.5",
+        "eslint": "^1.6.0",
+        "eslint-friendly-formatter": "^1.2.2",
+        "eslint-loader": "^1.0.0",
+        "file-loader": "^0.8.1",
+        "flux": "^2.1.1",
+        "form-serialize": "^0.7.0",
+        "html-webpack-plugin": "^2.0.3",
+        "image-webpack-loader": "^1.6.1",
+        "jquery": "^3.0.0-alpha1",
+        "moment": "^2.10.6",
+        "node-sass": "^3.3.3",
+        "postcss-loader": "^0.6.0",
+        "react": "^0.14.0",
+        "react-dom": "^0.14.0",
+        "react-hot-loader": "^2.0.0-alpha-4",
+        "react-tagsinput": "^2.0.1",
+        "sass-loader": "^3.0.0",
+        "style-loader": "^0.12.4",
+        "url-loader": "^0.5.5",
+        "webpack": "^1.12.2",
+        "webpack-dev-server": "^1.12.0"
+    },
+    "scripts": {
+        "build": "NODE_ENV=production webpack -p --progress --colors --config webpack.production.config.js",
+        "dev": "webpack-dev-server --progress --colors --hot --content-base dist",
+        "dev-ip": "webpack-dev-server --host 192.168.3.40 --progress --colors --hot --content-base dist --display-error-details",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "clean": "rm -rf ./dist"
+    },
+    "author": "Mark Vilrokx <mvilrokx@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mvilrokx/react-starter-template/issues"
+    },
+    "homepage": "https://github.com/mvilrokx/react-starter-template"
+}
