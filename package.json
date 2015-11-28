@@ -19,6 +19,7 @@
     "history": "^1.12.6",
     "json-loader": "^0.5.3",
     "randomcolor": "^0.4.0",
+    "react-google-maps": "^4.6.0",
     "react-intl": "^2.0.0-pr-3",
     "react-router": "^1.0.0-rc3",
     "react-tagsinput": "^2.0.1",
