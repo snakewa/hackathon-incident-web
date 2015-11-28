@@ -5,12 +5,13 @@ import {
     Link
 } from 'react-router';
 import { Container, Row, Col, Card, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormField, Checkbox, FormInput, FormSelect, FileUpload } from 'elemental';
-import { GoogleMap, Marker, SearchBox } from "react-google-maps";
+import { GoogleMap, Marker, SearchBox , InfoWindow} from "react-google-maps";
 
 require('elemental/less/elemental.less');
 
 import jquery from 'jquery'
 import lodash from 'lodash'
+import moment from 'moment'
 
 let $ = jquery
 let _ = lodash
@@ -30,12 +31,18 @@ let Welcome = React.createClass({
 
     getDefaultProps: function() {
     	return {
-    		incident_types: [
-	        	{label: '交通', value: 'traffic'},
-	        	{label: '塞車', value: 'traffic-jam'},
-	        	{label: '改道', value: 'road-change'},
-	        	{label: '抄牌', value: 'fine'},
-	        ],
+    	 incident_types: [
+            {label: '交通', value: 'traffic'},
+            {label: '塞車', value: 'traffic-jam'},
+            {label: '改道', value: 'road-change'},
+            {label: '抄牌', value: 'fine'}
+          ],
+          incident_icons: {
+            'traffic':{'icon':'http://www.tortue.me/emoji/traffic_light.png'},
+            'traffic-jam':{ 'icon':'http://www.tortue.me/emoji/checkered_flag.png'},
+            'road-change': {'icon':'http://www.tortue.me/emoji/construction.png'},
+            'fine': {'icon':'http://www.tortue.me/emoji/oncoming_police_car.png'},
+          },
 
 
     	};
@@ -59,6 +66,9 @@ let Welcome = React.createClass({
              var incidents = data.data.events;
              var  markers = [];
              _.mapKeys(incidents, function(value, key) {
+              
+                var icon = that.props.incident_icons[value.type] ? that.props.incident_icons[value.type]['icon'] : undefined;
+                console.log('icon',icon)
                 markers.push(
                   {
                     position: {
@@ -66,6 +76,11 @@ let Welcome = React.createClass({
                       lng: 1*value.long,
                     },
                     key: key,
+                    title: value.message,
+                    content: value.message,
+                    showInfo: false,
+                    media_url: value.media_url,
+                    icon: icon,
                     defaultAnimation: 2,
                   }
                 );
@@ -86,10 +101,39 @@ let Welcome = React.createClass({
       this.pullIncidents();
     },
 
-    onMarkerRightclick: function(index){
-      console.log(index);
+    handleMarkerClick: function(marker){
+      marker.showInfo = true;
+
+      console.log(marker);
+    this.setState(this.state);
+
 
     },
+
+  handleCloseclick (marker) {
+    marker.showInfo = false;
+    this.setState(this.state);
+  },
+
+
+    renderInfoWindow (ref, marker) {
+    console.log('renderInfoWindow',ref, marker);
+    
+      // Normal version: Pass string as content
+      return (
+        <InfoWindow
+          content={marker.content}
+          onCloseclick={this.handleCloseclick.bind(this, marker)}
+           key={`${ref}_info_window`}
+          >
+          <div>
+            <strong>{marker.content}</strong><br/>
+            <img className="map_icon" src={marker.media_url}/>
+            
+          </div>
+          </InfoWindow>
+      );
+  },
 
     render: function () {
     	var cards = [];
@@ -99,10 +143,11 @@ let Welcome = React.createClass({
       var ii = 0;
       _.mapKeys(this.state.incidents, function(value, key) {
           ii++
+          var time = moment(value.timestamp*1,'X').fromNow(); // 4 years ago
           cards.push(
             <Card key={'c'+ii}>
               <a href="#">
-                {value.message} by {value.createBy} ({value.createdAt})
+                {value.message} by {value.createBy} ({time})
               </a>
             </Card>
           );  
@@ -114,7 +159,7 @@ let Welcome = React.createClass({
             		<Row>
             			<Col lg="1/6"></Col>
             			<Col lg="4/6">
-            				<h1 className="u-text-center">Macau Incident Report</h1>
+            				<h1 className="elegantshadow u-text-center">Macau Incident Report</h1>
             			</Col>
             			<Col lg="1/6" style={{ marginTop: "12px" }}>
             				<Button size="sm" className="u-float-right" onClick={this.toggleModal}>Submit Incident</Button>
@@ -159,10 +204,13 @@ let Welcome = React.createClass({
 						        defaultZoom={13}
 						        defaultCenter={{lat: 22.1667, lng: 113.5500}}>
                      {this.state.markers.map((marker, index) => {
+                      const ref = `marker_${index}`;
                       return (
-                        <Marker
+                        <Marker key={ref} ref={ref}
                           {...marker}
-                          onRightclick={() => this.onMarkerRightclick(index)} />
+                          onClick={this.handleMarkerClick.bind(this, marker)}>
+                          {marker.showInfo ? this.renderInfoWindow(ref, marker) : null}
+                        </Marker>
                       );
                     })}
 						      </GoogleMap>
