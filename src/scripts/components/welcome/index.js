@@ -79,7 +79,7 @@ let Welcome = React.createClass({
           cards.push(
             <Card>
               <a href="#">
-                {key}
+                {value.message} by {value.createBy} ({value.createdAt})
               </a>
             </Card>
           );  
