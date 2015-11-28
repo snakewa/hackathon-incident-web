@@ -16,8 +16,11 @@ import moment from 'moment'
 let $ = jquery
 let _ = lodash
 
-const API_ROOT = 'http://192.168.10.241'
-const GET_URL = 'http://192.168.10.241/get/event'
+// const API_ROOT = 'http://192.168.10.241'
+// const GET_URL = 'http://192.168.10.241/get/event'
+
+const API_ROOT = 'http://incident-report.lovabird.com'
+const GET_URL = 'http://incident-report.lovabird.com/get/event'
 
 
 var timer_handler = false;
