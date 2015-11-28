@@ -32,6 +32,9 @@ var config = {
             test: /\.css$/,
             loader: 'style!css!'
         }, {
+            test: /\.less$/,
+            loader: 'style!css!less'
+        }, {
             test: /\.json$/,
             loader: 'json'
         }, {
