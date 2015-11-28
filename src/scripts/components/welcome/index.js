@@ -167,6 +167,21 @@ let Welcome = React.createClass({
     	var category = $('select[name="incident_category"] option:selected').val();
     	var description = $('textarea[name="incident_description"]').val();
 
+
+    	var r = 800 / 111300; // = 100 meters
+		var y0 = this.state.latitude;
+		var x0 = this.state.longitude;
+		var u = Math.random();
+		var v = Math.random();
+		var w = r * Math.sqrt(u);
+		var t = 2 * Math.PI * v;
+		var x = w * Math.cos(t);
+		var y1 = w * Math.sin(t);
+		var x1 = x / Math.cos(y0);
+
+		var newY = y0 + y1;
+		var newX = x0 + x1;
+
     	$.ajax({
 		    url: API_ROOT + '/post/event',
 		    data: JSON.stringify({
@@ -174,8 +189,8 @@ let Welcome = React.createClass({
 		    	type: category,
 		    	message: description,
 		    	media_url: image_url,
-		    	lat: this.state.latitude,
-		    	long: this.state.longitude
+		    	lat: newY,
+		    	long: newX
 		    }),
 		    cache: false,
 		    contentType: false,
