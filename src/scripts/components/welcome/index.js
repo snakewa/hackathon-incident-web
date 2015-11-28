@@ -9,15 +9,45 @@ import { GoogleMap, Marker, SearchBox } from "react-google-maps";
 
 require('elemental/less/elemental.less');
 
+import jquery from 'jquery'
+
+const GET_URL = 'http://192.168.10.241/get/event'
 
 let Welcome = React.createClass({
-    render: function () {
 
+    getInitialState: function() {
+        return {
+            incidents: []
+        };
+    },
+
+    componentDidMount: function() {
+
+      jquery.ajax({
+        url: GET_URL,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+          console.log(data);
+          if(data.status){
+              this.setState({incidents: data.events});  
+          }
+          
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+        }.bind(this)
+      });
+
+    },
+
+    render: function () {
     	var cards = [];
+      
 
     	for( var i = 0; i < 20; i++ ) {
 			cards.push(
-				<Elemental.Card>
+				<Elemental.Card key={'l'+i}>
 					<a href="#">
 						Hello
 					</a>
@@ -27,9 +57,8 @@ let Welcome = React.createClass({
 
         return (
             <div className="welcome">
-
             	<h1 className="u-text-center">Macau Incident Report</h1>
-
+              
             	<Elemental.Container>
 	            	<Elemental.Row>
 	            		<Elemental.Col lg="1/4">
