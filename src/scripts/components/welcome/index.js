@@ -19,6 +19,8 @@ let _ = lodash
 const API_ROOT = 'http://192.168.10.241'
 const GET_URL = 'http://192.168.10.241/get/event'
 
+
+var timer_handler = false;
 let Welcome = React.createClass({
 
 	getInitialState: function() {
@@ -116,6 +118,14 @@ let Welcome = React.createClass({
 
     componentDidMount: function() {
       this.pullIncidents();
+      var that = this;
+      var do_refresh = function(){
+          that.pullIncidents();
+      };
+
+      var timer_handler = setInterval(function(){
+          do_refresh();
+      },3000);
     },
 
     submitIncident: function() {
@@ -185,6 +195,10 @@ let Welcome = React.createClass({
 		        that.setState({
 		        	modalIsOpen: false
 		        });
+
+            setTimeout(function(){
+              that.pullIncidents();
+            },500);
 		        
 		    }
 		});
