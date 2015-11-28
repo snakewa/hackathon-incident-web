@@ -24,7 +24,12 @@ var config = {
         }, {
             test: /\.scss$/,
             loader: 'style!css!postcss!sass'
-        }, {
+        },
+{
+            test: /\.less$/,
+            loader: 'style!css!less'
+        },
+ {
             test: /\.json$/,
             loader: 'json'
         }, {
