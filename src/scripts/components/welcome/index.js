@@ -16,16 +16,18 @@ import moment from 'moment'
 let $ = jquery
 let _ = lodash
 
+const API_ROOT = 'http://192.168.10.241'
 const GET_URL = 'http://192.168.10.241/get/event'
 
 let Welcome = React.createClass({
 
-	   getInitialState: function() {
+	getInitialState: function() {
         return {
             incidents: {},
             markers: [],
             modalIsOpen: false,
-            
+            latitude: null,
+            longitude: null
         };
     },
 
@@ -49,10 +51,23 @@ let Welcome = React.createClass({
     },
 
     toggleModal: function() {
+
+    	if( this.state.modalIsOpen == false ) {
+    		console.log('Getting Geolocation');
+    		navigator.geolocation.getCurrentPosition(this.GetLocation);
+    	}
+
     	this.setState({
     		modalIsOpen: !this.state.modalIsOpen
     	});
     },
+
+    GetLocation: function(location) {
+	    this.setState({
+	    	latitude: location.coords.latitude,
+	    	longitude: location.coords.longitude
+	    });
+	},
 
     pullIncidents: function(){
       var that = this;
@@ -68,9 +83,8 @@ let Welcome = React.createClass({
              _.mapKeys(incidents, function(value, key) {
               
                 var icon = that.props.incident_icons[value.type] ? that.props.incident_icons[value.type]['icon'] : undefined;
-                console.log('icon',icon)
-                markers.push(
-                  {
+                console.log('icon',icon);
+                markers.push( {
                     position: {
                       lat: 1*value.lat,
                       lng: 1*value.long,
@@ -82,8 +96,8 @@ let Welcome = React.createClass({
                     media_url: value.media_url,
                     icon: icon,
                     defaultAnimation: 2,
-                  }
-                );
+                  });
+
             });
              console.log('update',{incidents: data.data.events, markers:markers})
 						that.setState({incidents: data.data.events, markers:markers});
@@ -101,24 +115,110 @@ let Welcome = React.createClass({
       this.pullIncidents();
     },
 
-    handleMarkerClick: function(marker){
-      marker.showInfo = true;
+    submitIncident: function() {
 
-      console.log(marker);
-    this.setState(this.state);
+    	var that = this;
+    	var image = $('input[name="incident_image"]');
 
+    	var data = new FormData();
+		$.each(image[0].files, function(i, file) {
+		    data.append('image', file);
+		});
 
+		$.ajax({
+		    url: API_ROOT + '/media/upload',
+		    data: data,
+		    cache: false,
+		    contentType: false,
+		    processData: false,
+		    type: 'POST',
+		    success: function(data){
+		        // console.log(data);
+
+		        if( !data.status || data.data.files.length == 0 ) {
+		        	alert( data.message );
+		        	return false;
+		        }
+
+		        var image_url = data.data.files[0];
+
+		        console.log(data);
+
+		        that.createIncident( image_url );
+		    }
+		});
     },
+
+    createIncident: function( image_url ) {
+
+    	var that = this;
+
+    	var user = $('input[name="username"]').val();
+    	var category = $('select[name="incident_category"] option:selected').val();
+    	var description = $('textarea[name="incident_description"]').val();
+
+    	$.ajax({
+		    url: API_ROOT + '/post/event',
+		    data: JSON.stringify({
+		    	createBy: user,
+		    	type: category,
+		    	message: description,
+		    	media_url: image_url,
+		    	lat: this.state.latitude,
+		    	long: this.state.longitude
+		    }),
+		    cache: false,
+		    contentType: false,
+		    processData: false,
+		    type: 'POST',
+		    success: function(data){
+		        // console.log(data);
+
+		        if( !data.status ) {
+		        	alert( data.message );
+		        	return false;
+		        }
+
+		        that.setState({
+		        	modalIsOpen: false
+		        });
+		        
+		    }
+		});
+	},
+
+    onMarkerRightclick: function(index){
+        console.log(index);
+    },
+
+    handleMarkerClick: function(marker){
+
+      for( var i =0 ; i < this.state.markers.length ; i++ ){
+          this.state.markers[i].showInfo = false;
+      }
+      marker.showInfo = true;
+      console.log(marker);
+      this.setState({markers: this.state.markers});
+  },
 
   handleCloseclick (marker) {
     marker.showInfo = false;
-    this.setState(this.state);
+    this.setState({markers: this.state.markers});
+  },
+
+  handleCardClick(ref){
+    console.log('handleCardClick',ref);
+    if(this.state.markers[ref]){
+      this.handleMarkerClick(this.state.markers[ref]);
+    }
   },
 
 
     renderInfoWindow (ref, marker) {
     console.log('renderInfoWindow',ref, marker);
-    
+      var media_url = marker.media_url ? (
+            /^\//i.test(marker.media_url) ? ( API_ROOT + marker.media_url) : marker.media_url
+        ) : false;
       // Normal version: Pass string as content
       return (
         <InfoWindow
@@ -128,7 +228,7 @@ let Welcome = React.createClass({
           >
           <div>
             <strong>{marker.content}</strong><br/>
-            <img className="map_icon" src={marker.media_url}/>
+            { media_url ? (<img className="map_icon" src={media_url}/>) : null }
             
           </div>
           </InfoWindow>
@@ -138,19 +238,24 @@ let Welcome = React.createClass({
     render: function () {
     	var cards = [];
       
-      console.log(['state', this.state]);
-      
+
+       //console.log(['state', this.state]);
+
       var ii = 0;
+      var that = this;
+
       _.mapKeys(this.state.incidents, function(value, key) {
-          ii++
+          
           var time = moment(value.timestamp*1,'X').fromNow(); // 4 years ago
+
           cards.push(
-            <Card key={'c'+ii}>
+            <Card key={'c'+ii} onClick={that.handleCardClick.bind(that,ii)}>
               <a href="#">
                 {value.message} by {value.createBy} ({time})
               </a>
             </Card>
           );  
+          ii++
       });
 
         return (
@@ -171,19 +276,25 @@ let Welcome = React.createClass({
 					<ModalHeader text="Submit Incident" showCloseButton onClose={this.toggleModal} />
 					<ModalBody>
 						<Form>
-							<FormField label="Type" htmlFor="basic-form-input-email">
+							<FormField label="Your Name" htmlFor="username">
+								<FormInput autofocus name="username" />
+							</FormField>
+
+							<FormField label="Type" htmlFor="incident_category">
 								<FormSelect autofocus options={this.props.incident_types} firstOption="-- Please Select --" name="incident_category" />
 							</FormField>
-							<FormField label="Description" htmlFor="basic-form-input-text">
+
+							<FormField label="Description" htmlFor="incident_description">
 								<FormInput placeholder="Description" name="incident_description" multiline />
 							</FormField>
-							<FormField label="Image" htmlFor="basic-form-input-image">
-								<FileUpload buttonLabelInitial="Select Image" accept="image/jpg, image/gif, image/png" name="incident_image" multiline />
+
+							<FormField label="Image" htmlFor="incident_image">
+								<FileUpload buttonLabelInitial="Select Image" accept="image/jpg, image/jpeg, image/gif, image/png" name="incident_image" multiline />
 							</FormField>
 
 							<hr/>
 
-							<Button type="primary">Submit</Button>
+							<Button type="primary" onClick={this.submitIncident}>Submit</Button>
 						</Form>
 					</ModalBody>
 				</Modal>
@@ -191,7 +302,7 @@ let Welcome = React.createClass({
             	<Container>
 	            	<Row>
 	            		<Col lg="1/4">
-	            			{cards}
+	            			{cards.reverse()}
 	            		</Col>
 
 	            		<Col lg="3/4">

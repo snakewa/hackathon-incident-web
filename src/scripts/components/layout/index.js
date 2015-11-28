@@ -11,9 +11,9 @@ let Layout = React.createClass({
         var mainClass = "layout"
         return (
             <div className={mainClass}>
-                Layout:
-
+ {/*
                 <Link to="/welcome">Welcome</Link> | <Link to="/aboutus">About us</Link>
+*/}
                 {this.props.children}
             </div>
         );
