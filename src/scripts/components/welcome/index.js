@@ -27,10 +27,7 @@ let Welcome = React.createClass({
             markers: [],
             modalIsOpen: false,
             latitude: null,
-            longitude: null,
-            lat:null,
-            lng:null,
-            zoom: 13
+            longitude: null
         };
     },
 
@@ -199,12 +196,9 @@ let Welcome = React.createClass({
       for( var i =0 ; i < this.state.markers.length ; i++ ){
           this.state.markers[i].showInfo = false;
       }
-
       marker.showInfo = true;
       console.log(marker);
-      var lat =  _.isNumber(marker.lat*1)?marker.lat*1 : 22.1667;
-      var lng =  _.isNumber(marker.lng*1)?marker.lng*1 :  113.5500;
-      this.setState({zoom: 16 , lat:lat , lng:lng, markers: this.state.markers});
+      this.setState({markers: this.state.markers});
   },
 
   handleCloseclick (marker) {
@@ -319,8 +313,6 @@ let Welcome = React.createClass({
 						          },
 						        }}
 						        defaultZoom={13}
-                    zoom={ this.state.zoom }
-                    
 						        defaultCenter={{lat: 22.1667, lng: 113.5500}}>
                      {this.state.markers.map((marker, index) => {
                       const ref = `marker_${index}`;
