@@ -37,14 +37,14 @@ let Welcome = React.createClass({
 	            		</Elemental.Col>
 
 	            		<Elemental.Col lg="3/4">
-	            			<section style={{height: "100%"}}>
+	            			<section style={{height: "800px"}}>
 						      <GoogleMap containerProps={{
 						          style: {
-						            height: "100%",
+						            height: "800px",
 						          },
 						        }}
-						        defaultZoom={3}
-						        defaultCenter={{lat: -25.363882, lng: 131.044922}}>
+						        defaultZoom={14}
+						        defaultCenter={{lat: 22.1667, lng: 113.5500}}>
 						      </GoogleMap>
 						    </section>
 	            		</Elemental.Col>
