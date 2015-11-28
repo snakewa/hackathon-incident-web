@@ -4,7 +4,7 @@ import React from 'react';
 import {
     Link
 } from 'react-router';
-import { Container, Row, Col, Card, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'elemental';
+import { Container, Row, Col, Card, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormField, Checkbox, FormInput, FormSelect, FileUpload } from 'elemental';
 import { GoogleMap, Marker, SearchBox } from "react-google-maps";
 
 require('elemental/less/elemental.less');
@@ -23,7 +23,21 @@ let Welcome = React.createClass({
         return {
             incidents: [],
             modalIsOpen: false,
+            
         };
+    },
+
+    getDefaultProps: function() {
+    	return {
+    		incident_types: [
+	        	{label: '交通', value: 'traffic'},
+	        	{label: '塞車', value: 'traffic-jam'},
+	        	{label: '改道', value: 'road-change'},
+	        	{label: '抄牌', value: 'fine'},
+	        ],
+
+
+    	};
     },
 
     toggleModal: function() {
@@ -87,18 +101,29 @@ let Welcome = React.createClass({
             	</Container>
 
             	<Modal isOpen={this.state.modalIsOpen} onCancel={this.toggleModal} backdropClosesModal>
-					<ModalHeader text="Lots of text to show scroll behavior" showCloseButton onClose={this.toggleModal} />
-					<ModalBody>[...]</ModalBody>
-					<ModalFooter>
-						<Button type="primary" onClick={this.toggleModal}>Close modal</Button>
-						<Button type="link-cancel" onClick={this.toggleModal}>Also closes modal</Button>
-					</ModalFooter>
+					<ModalHeader text="Submit Incident" showCloseButton onClose={this.toggleModal} />
+					<ModalBody>
+						<Form>
+							<FormField label="Type" htmlFor="basic-form-input-email">
+								<FormSelect autofocus options={this.props.incident_types} firstOption="-- Please Select --" name="incident_category" />
+							</FormField>
+							<FormField label="Description" htmlFor="basic-form-input-text">
+								<FormInput placeholder="Description" name="incident_description" multiline />
+							</FormField>
+							<FormField label="Image" htmlFor="basic-form-input-image">
+								<FileUpload buttonLabelInitial="Select Image" accept="image/jpg, image/gif, image/png" name="incident_image" multiline />
+							</FormField>
+
+							<hr/>
+
+							<Button type="primary">Submit</Button>
+						</Form>
+					</ModalBody>
 				</Modal>
 
             	<Container>
 	            	<Row>
 	            		<Col lg="1/4">
-
 	            			{cards}
 	            		</Col>
 
